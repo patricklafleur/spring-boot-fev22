@@ -31,15 +31,50 @@
 		</developer>
 	</developers>
 
+	<!-- scopes -->
+	<!--
+	compile: compilation(buildpath) + exécution(classpath)
+	runtime: !compilation + exécution(package)
+	provided: compillation + exécution(!package)
+	test: compilation(src/test/java) + !package
+	system:
+	-->
+
 	<dependencies>
-		<!-- transitive dependencies: spring-core, spring-context -->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-			<!-- version -->
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<!-- @Configuration, @Component, @Service, @Repository -->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter</artifactId>-->
+<!--			<scope>compile</scope>-->
+<!--		</dependency>-->
+
+		<!-- https://mvnrepository.com/artifact/javax.servlet/servlet-api -->
+		<!-- HttpRequest, HttpServlet, HttpParam, HttpResponse -->
+<!--		<dependency>-->
+<!--			<groupId>javax.servlet</groupId>-->
+<!--			<artifactId>servlet-api</artifactId>-->
+<!--			<version>3.0-alpha-1</version>-->
+<!--			<scope>provided</scope>-->
+<!--		</dependency>-->
+
+
+		<!--
+		spring-webmvc(@Controller, @RestController, @ResponseBody, @ResponseStatus)
+		jackson-* (JSON, @JsonIgnore, @JsonName, @JsonIgnoreProperties)
+		tomcat 9
+		-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- API + HTML -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
