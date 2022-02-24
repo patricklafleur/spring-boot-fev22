@@ -4,14 +4,32 @@ import java.util.Date;
 
 import org.springframework.core.style.ToStringCreator;
 
-public class User {
+import javax.validation.constraints.*;
 
+public class User {
 	private Long id;
+
+	@NotNull
+	@NotBlank
+	@Size(min=2, max=64)
 	private String firstName;
+
+	@NotNull
+	@NotBlank
+	@Size(min=2)
 	private String lastName;
+
+	@NotNull
+	@NotBlank()
+	@Email
 	private String email;
+
+	@Pattern(regexp="^([0-9]{3}) [0-9]{3}-[0-9]{4}$")  // "1" "(012) 345-0679"
 	private String mobile;
-	private Date dateOfBirth;
+
+	@NotNull
+	@PastOrPresent
+	private Date dateOfBirth = null;
 
 	public User() {
 		this(-1, "", "", "", "");

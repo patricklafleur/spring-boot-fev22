@@ -7,8 +7,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,17 +50,28 @@ public class UsersApiController {
 
     @Autowired private UsersDAO dao;
 
-    @GetMapping("/users")   // GET /users -> 200 OK
+    @GetMapping(path="/users")   // GET /users -> 200 OK
     public List<User> getUsers() {
         return dao.list();
     }
 
     @PostMapping("/users")
-    public ResponseEntity<User> create(@RequestBody User body) {  // new User() -> JSON -> binding process (BindingResult) ->
+    public ResponseEntity<User> create(@Valid @RequestBody User body, BindingResult result) {  // new User() -> JSON -> binding process (BindingResult)  -> Validator -> binding.hasErrors() -> 400
+        if(result.hasErrors()) {
+            //System.out.println(result);
+
+            //  for(FieldError error : result.getFieldErrors()) {
+            //              System.out.println(error.getField() + " : " + error.getDefaultMessage());
+            //  }
+
+            //return new ResponseEntity<User>(new ApiErrors(bindingResult.getFieldErrors()), HttpStatus.UNPROCESSABLE_ENTITY);
+            return new ResponseEntity<User>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
         User created = dao.create(body);
 
         ResponseEntity<User> response = new ResponseEntity<User>(created, HttpStatus.CREATED);  // 201
-        response.getHeaders().add("Location", "http://localhost:8080/users/" + created.getId());
+        //response.getHeaders().add("Location", "http://localhost:8080/users/" + created.getId());
 
         return response;
     }
@@ -74,7 +88,7 @@ public class UsersApiController {
     }
 
     @PutMapping("/users/{id}")
-    public ResponseEntity<Void> update(@PathVariable("id") long id, @RequestBody User body) {
+    public ResponseEntity<Void> update(@PathVariable("id") long id, @Valid @RequestBody User body) {
         User updated = dao.update(id, body);
 
         if(updated == null) {
