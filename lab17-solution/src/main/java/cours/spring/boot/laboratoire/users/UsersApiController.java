@@ -1,7 +1,7 @@
-package cours.spring.boot.laboratoire;
+package cours.spring.boot.laboratoire.users;
 
-import cours.spring.boot.laboratoire.dao.UsersDAO;
-import cours.spring.boot.laboratoire.models.User;
+import cours.spring.boot.laboratoire.api.ApiErrors;
+import cours.spring.boot.laboratoire.persistence.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 // REST -> Representational Entity State Transfer (JSON, CSV, XML, ?) -> HTTP (GET, POST, PUT, DELETE)
@@ -55,57 +55,50 @@ public class UsersApiController {
         return dao.list();
     }
 
+    // 1. Transformer le json en classe
+    // 2. Valider
+    // 3. Déclencher le use case (déléguer @Service)
+    // 4. Interpréter le résultat du service
+    // 5. Mapper le résultat vers une réponse HTTP
+
+    // Validator.validate(user) -> !valid throw new MethodNotValidArgumentException() -> create(user)
     @PostMapping("/users")
-    public ResponseEntity<User> create(@Valid @RequestBody User body, BindingResult result) {  // new User() -> JSON -> binding process (BindingResult)  -> Validator -> binding.hasErrors() -> 400
-        if(result.hasErrors()) {
-            //System.out.println(result);
-
-            //  for(FieldError error : result.getFieldErrors()) {
-            //              System.out.println(error.getField() + " : " + error.getDefaultMessage());
-            //  }
-
-            //return new ResponseEntity<User>(new ApiErrors(bindingResult.getFieldErrors()), HttpStatus.UNPROCESSABLE_ENTITY);
-            return new ResponseEntity<User>(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-
+    public ResponseEntity<User> create(@Valid @RequestBody User body) {  // new User() -> JSON -> binding process (BindingResult)  -> Validator -> binding.hasErrors() -> 400
         User created = dao.create(body);
-
         ResponseEntity<User> response = new ResponseEntity<User>(created, HttpStatus.CREATED);  // 201
         //response.getHeaders().add("Location", "http://localhost:8080/users/" + created.getId());
-
         return response;
     }
 
+
+    // try { controller.getById() } catch(Exception e) { if(exceptionHandlers.match(e)) { callExceptionHandler(e) }  else { 500 } }
+
     @GetMapping("/users/{id}")
-    public ResponseEntity<User> getById(@PathVariable("id") long id) {
-        User found = dao.get(id);
-
-        if(found == null) {
-            return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
-        }
-
-        return new ResponseEntity<User>(found, HttpStatus.OK);
+    public ResponseEntity<User> getById(@PathVariable("id") long id) throws ObjectNotFoundException {
+        return new ResponseEntity<User>(dao.get(id), HttpStatus.OK);
     }
 
     @PutMapping("/users/{id}")
-    public ResponseEntity<Void> update(@PathVariable("id") long id, @Valid @RequestBody User body) {
-        User updated = dao.update(id, body);
-
-        if(updated == null) {
-            return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
-        }
-
+    public ResponseEntity<Void> update(@PathVariable("id") long id, @Valid @RequestBody User body) throws ObjectNotFoundException {
+        // DRY = Don't Repeat Yourself
+        dao.update(id, body);
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);  // 203 (idempotente -> read only)
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") long id) {
-        Long deleted = dao.delete(id);
-
-        if(deleted == null) {
-            return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
-        }
-
+    public ResponseEntity<Void> delete(@PathVariable("id") long id) throws ObjectNotFoundException {
+        dao.delete(id);  // throw
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
+
+//    @ExceptionHandler(ObjectNotFoundException.class)
+//    public ResponseEntity<Void> handleObjectNotFound(ObjectNotFoundException e) {
+//        return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+//    }
+//
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    public ResponseEntity<ApiErrors> handle(MethodArgumentNotValidException e) {
+//        return new ResponseEntity<ApiErrors>(new ApiErrors(e.getBindingResult()),
+//                HttpStatus.UNPROCESSABLE_ENTITY);
+//    }
 }

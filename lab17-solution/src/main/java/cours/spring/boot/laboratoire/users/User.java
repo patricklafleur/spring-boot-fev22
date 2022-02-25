@@ -1,4 +1,4 @@
-package cours.spring.boot.laboratoire.models;
+package cours.spring.boot.laboratoire.users;
 
 import java.util.Date;
 

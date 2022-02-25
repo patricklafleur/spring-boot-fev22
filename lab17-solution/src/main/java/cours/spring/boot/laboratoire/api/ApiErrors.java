@@ -1,18 +1,24 @@
-package cours.spring.api;
+package cours.spring.boot.laboratoire.api;
+
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.validation.BindingResult;
-
 public class ApiErrors {
+	// "email" -> ["le format", "le champs est requis"]
 	Map<String, List<String>> errors = new HashMap<>();
 	
 	public ApiErrors() {}
-	
-	// TODO
+
+	public ApiErrors(BindingResult bindingResult) {
+		for(FieldError fe : bindingResult.getFieldErrors()) {
+			add(fe.getField(), fe.getDefaultMessage());
+		}
+	}
 
 	public ApiErrors add(String property, String message) {
 		getPropertyErrors(property).add(message);

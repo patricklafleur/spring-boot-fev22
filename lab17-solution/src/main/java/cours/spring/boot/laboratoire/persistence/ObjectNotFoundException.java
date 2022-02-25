@@ -1,4 +1,4 @@
-package cours.spring.persistence;
+package cours.spring.boot.laboratoire.persistence;
 
 public class ObjectNotFoundException extends Exception {
 	private static final long serialVersionUID = 1L;

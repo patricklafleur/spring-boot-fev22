@@ -1,9 +1,10 @@
-package cours.spring.boot.laboratoire.dao;
+package cours.spring.boot.laboratoire.users;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import cours.spring.boot.laboratoire.models.User;
+import cours.spring.boot.laboratoire.persistence.ObjectNotFoundException;
+import cours.spring.boot.laboratoire.users.User;
 import org.springframework.stereotype.Component;
 
 
@@ -37,14 +38,17 @@ public class UsersDAO {
 	 *            user id
 	 * @return user object for given id
 	 */
-	public User get(Long id) {
+	public User get(Long id) throws ObjectNotFoundException {
 
 		for (User c : users) {
 			if (c.getId().equals(id)) {
 				return c;
 			}
 		}
-		return null;
+
+		throw new ObjectNotFoundException(id, User.class);
+
+		//return null;
 	}
 
 	/**
@@ -69,7 +73,7 @@ public class UsersDAO {
 	 *            the user id
 	 * @return id of deleted user object
 	 */
-	public Long delete(Long id) {
+	public Long delete(Long id) throws ObjectNotFoundException {
 
 		for (User c : users) {
 			if (c.getId().equals(id)) {
@@ -78,7 +82,9 @@ public class UsersDAO {
 			}
 		}
 
-		return null;
+		throw new ObjectNotFoundException(id, User.class);
+
+		//return null;
 	}
 
 	/**
@@ -89,7 +95,7 @@ public class UsersDAO {
 	 * @param user
 	 * @return user object with id
 	 */
-	public User update(Long id, User user) {
+	public User update(Long id, User user) throws ObjectNotFoundException {
 
 		for (User c : users) {
 			if (c.getId().equals(id)) {
@@ -100,7 +106,9 @@ public class UsersDAO {
 			}
 		}
 
-		return null;
+		throw new ObjectNotFoundException(id, User.class);
+
+		//return null;
 	}
 
 }
